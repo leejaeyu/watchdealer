@@ -134,6 +134,16 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
+# --- CORS 최소 설정 ---
+CORS_ALLOWED_ORIGINS = [
+    "http://15.164.28.224:3000",
+]
+CORS_ALLOW_CREDENTIALS = True
+
+# CSRF (폼/쿠키 쓸 때)
+CSRF_TRUSTED_ORIGINS = [
+    "http://15.164.28.224:3000",
+]
 # ── CORS/CSRF ────────────────────────────────────────────────────────────────
 # 프론트 주소(EC2 IP 또는 도메인) 맞춰서 쉼표로 추가
 CORS_ALLOWED_ORIGINS = os.getenv(
