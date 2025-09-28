@@ -24,7 +24,7 @@ USE_I18N = True
 USE_TZ = True
 
 # ── 정적/미디어 ─────────────────────────────────────────────────────────────
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"   # collectstatic 목적지 (Nginx 서빙)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
