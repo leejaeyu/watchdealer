@@ -45,14 +45,14 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",      # ← 최상단 근처 (중복 금지)
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",      # 정적
+    "corsheaders.middleware.CorsMiddleware",           # CORS (CommonMiddleware보다 위)
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",   # ← 추가
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
@@ -134,27 +134,12 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-# --- CORS 최소 설정 ---
-CORS_ALLOWED_ORIGINS = [
-    "http://15.164.28.224:3000",
-]
-CORS_ALLOW_CREDENTIALS = True
+# --- CORS / CSRF ---
+# 배포/로컬 모두 포함한 기본값(환경변수로 덮어쓸 수 있음)
+_DEFAULT_CORS = "http://15.164.28.224:3000,http://127.0.0.1:3000,http://localhost:3000"
 
-# CSRF (폼/쿠키 쓸 때)
-CSRF_TRUSTED_ORIGINS = [
-    "http://15.164.28.224:3000",
-]
-# ── CORS/CSRF ────────────────────────────────────────────────────────────────
-# 프론트 주소(EC2 IP 또는 도메인) 맞춰서 쉼표로 추가
-CORS_ALLOWED_ORIGINS = os.getenv(
-    "CORS_ALLOWED_ORIGINS",
-    "http://127.0.0.1:3000,http://localhost:3000"
-).split(",")
-
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "CSRF_TRUSTED_ORIGINS",
-    "http://127.0.0.1:3000,http://localhost:3000"
-).split(",")
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", _DEFAULT_CORS).split(",")
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", _DEFAULT_CORS).split(",")
 
 CORS_ALLOW_CREDENTIALS = True
 
