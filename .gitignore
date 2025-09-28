@@ -1,0 +1,39 @@
+# --- Python / Django ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.env.*
+venv/
+.venv/
+.envrc
+*.sqlite3
+media/
+staticfiles/
+# If collectstatic output lives here
+backend/static/
+backend/media/
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+dist/
+.yarn/*
+!.yarn/releases
+*.log
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# --- Docker (있다면) ---
+*.pid
+*.sock
+docker-data/
