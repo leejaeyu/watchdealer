@@ -25,6 +25,8 @@ import {
   type WatchVariant,
   type Country,
 } from "@/lib/watches";
+import CarouselShell from "../../components/CarouselShell";
+import Image from "next/image";
 
 /* 이미지 절대경로 보정 */
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE!;
@@ -293,18 +295,38 @@ export default function WatchBrowser() {
     <Box sx={{ mt: 2 }}>
       {/* 1) 브랜드 - 미니 카드 */}
       <Section title="브랜드">
-        <Grid container spacing={1}>
+        <CarouselShell ariaLabel="브랜드 목록" step="page" snap="proximity">
           {brands.map((b) => {
             const active = brand?.id === b.id;
             return (
-              <Grid key={b.id} size={{ xs: 4, sm: 3, md: 2 }}>
+              <Box
+                key={b.id}
+                role="listitem"
+                sx={{
+                  flex: "0 0 auto",
+                  width: { xs: 80, sm: 90, md: 95 },
+                  scrollSnapAlign: "start",
+                }}
+              >
                 <Card
                   variant={active ? "outlined" : undefined}
-                  sx={{ height: 86, borderRadius: 1 }}
+                  sx={{
+                    height: 86,
+                    borderRadius: 1,
+                    ...(active && {
+                      borderColor: "primary.main",
+                      boxShadow: (t) =>
+                        `0 0 0 1px ${t.palette.primary.main} inset`,
+                      bgcolor: (t) => t.palette.action.selected,
+                    }),
+                  }}
                 >
                   <CardActionArea
                     onClick={() => setBrand(b)}
                     sx={{ height: "100%", p: 1 }}
+                    aria-pressed={active ? "true" : "false"}
+                    role="button"
+                    tabIndex={0}
                   >
                     <Stack alignItems="center" spacing={0.75}>
                       <Avatar
@@ -317,110 +339,161 @@ export default function WatchBrowser() {
                         }}
                         variant="square"
                       />
-                      <Typography variant="caption" fontWeight={700} noWrap>
+                      <Typography
+                        variant="caption"
+                        fontWeight={700}
+                        noWrap
+                        sx={{ maxWidth: "100%" }}
+                      >
                         {b.name_en}
                       </Typography>
                     </Stack>
                   </CardActionArea>
                 </Card>
-              </Grid>
+              </Box>
             );
           })}
-        </Grid>
+        </CarouselShell>
       </Section>
 
-      {/* 2) 모델 - 미니 카드 */}
+      {/* 2) 모델 - 미니 카드 (캐러셀 적용) */}
       {!!brand && (
         <Section title="모델" sub={`${brand.name_en} / ${brand.name_ko}`}>
           {loading && models.length === 0 ? (
             <CenteredLoader />
           ) : (
-            <Grid container spacing={1}>
+            <CarouselShell ariaLabel="모델 목록" step="page" snap="proximity">
               {models.map((m) => {
                 const active = model?.id === m.id;
                 return (
-                  <Grid key={m.id} size={{ xs: 6, sm: 4, md: 3, lg: 2 }}>
+                  <Box
+                    key={m.id}
+                    role="listitem"
+                    sx={{
+                      flex: "0 0 auto",
+                      width: { xs: 120, sm: 140 },
+                      scrollSnapAlign: "start",
+                    }}
+                  >
                     <Card
                       variant={active ? "outlined" : undefined}
-                      sx={{ height: 150, borderRadius: 1 }}
+                      sx={{
+                        height: 50,
+                        borderRadius: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        ...(active && {
+                          borderColor: "primary.main",
+                          boxShadow: (t) =>
+                            `0 0 0 1px ${t.palette.primary.main} inset`,
+                          bgcolor: (t) => t.palette.action.selected,
+                        }),
+                      }}
                     >
                       <CardActionArea
                         onClick={() => setModel(m)}
-                        sx={{ height: "100%", p: 1 }}
+                        sx={{
+                          height: "100%",
+                          px: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        aria-pressed={active ? "true" : "false"}
+                        role="button"
+                        tabIndex={0}
                       >
-                        {imgURL(m.image) ? (
-                          <Box
-                            component="img"
-                            src={imgURL(m.image)}
-                            alt={m.nickname || "model"}
-                            sx={{
-                              width: "100%",
-                              height: 92,
-                              objectFit: "cover",
-                              borderRadius: 0.75,
-                              bgcolor: "action.hover",
-                            }}
-                          />
-                        ) : (
-                          <Placeholder h={92} />
-                        )}
                         <Typography
-                          mt={0.5}
-                          variant="caption"
+                          variant="body2"
                           fontWeight={700}
-                          textAlign="center"
                           noWrap
-                          display="block"
+                          sx={{ width: "100%", textAlign: "center" }}
                         >
                           {m.nickname || "(닉네임 없음)"}
                         </Typography>
                       </CardActionArea>
                     </Card>
-                  </Grid>
+                  </Box>
                 );
               })}
-            </Grid>
+            </CarouselShell>
           )}
         </Section>
       )}
 
-      {/* 3) 버전트 - 미니 카드 */}
+      {/* 3) 버전트 - 미니 카드 (캐러셀 적용) */}
       {!!model && (
         <Section title="버전트">
           {loading && variants.length === 0 ? (
             <CenteredLoader />
           ) : (
-            <Grid container spacing={1}>
+            <CarouselShell ariaLabel="버전트 목록" step="page" snap="proximity">
               {variants.map((v) => {
                 const active = variant?.id === v.id;
+                const imgSrc = imgURL(v.image || model.image);
                 return (
-                  <Grid key={v.id} size={{ xs: 6, sm: 4, md: 3 }}>
+                  <Box
+                    key={v.id}
+                    role="listitem"
+                    sx={{
+                      flex: "0 0 auto",
+                      width: { xs: 140, sm: 160, md: 180 }, // 카드 폭
+                      scrollSnapAlign: "start",
+                    }}
+                  >
                     <Card
                       variant={active ? "outlined" : undefined}
-                      sx={{ height: 170, borderRadius: 1 }}
+                      sx={{
+                        height: 170,
+                        borderRadius: 1,
+                        ...(active && {
+                          borderColor: "primary.main",
+                          boxShadow: (t) =>
+                            `0 0 0 1px ${t.palette.primary.main} inset`,
+                          bgcolor: (t) => t.palette.action.selected,
+                        }),
+                      }}
                     >
                       <CardActionArea
                         onClick={() => setVariant(v)}
                         sx={{ height: "100%", p: 1 }}
+                        aria-pressed={active ? "true" : "false"}
+                        role="button"
+                        tabIndex={0}
                       >
-                        {imgURL(v.image || model.image) ? (
+                        {imgSrc ? (
                           <Box
-                            component="img"
-                            src={imgURL(v.image || model.image)}
-                            alt={v.model_number}
                             sx={{
+                              position: "relative",
                               width: "100%",
-                              height: 104,
-                              objectFit: "cover",
+                              height: 104, // 기존 104 → 살짝 여유 (원하면 104 유지)
                               borderRadius: 0.75,
                               bgcolor: "action.hover",
+                              overflow: "hidden",
                             }}
-                          />
+                          >
+                            <Image
+                              src={imgSrc}
+                              alt={v.model_number}
+                              fill
+                              // 카드 폭에 맞춘 반응형 사이즈 (브레이크포인트에 맞춰 조절)
+                              sizes="(max-width:600px) 140px, (max-width:900px) 160px, 180px"
+                              style={{ objectFit: "contain" }} // ✅ 크롭 없이 꽉 채우기(레터박스)
+                              // placeholder="empty"            // 필요하면 blurDataURL 구성해 placeholder="blur"
+                              // unoptimized                    // (임시) next.config에 이미지 도메인 등록 전 테스트용
+                            />
+                          </Box>
                         ) : (
-                          <Placeholder h={104} />
+                          <Placeholder h={120} />
                         )}
                         <Stack mt={0.5} spacing={0.25} alignItems="center">
-                          <Typography variant="caption" fontWeight={700} noWrap>
+                          <Typography
+                            variant="caption"
+                            fontWeight={700}
+                            noWrap
+                            title={v.model_number}
+                          >
                             {v.model_number}
                           </Typography>
                           {!!v.color && (
@@ -433,10 +506,10 @@ export default function WatchBrowser() {
                         </Stack>
                       </CardActionArea>
                     </Card>
-                  </Grid>
+                  </Box>
                 );
               })}
-            </Grid>
+            </CarouselShell>
           )}
         </Section>
       )}

@@ -23,7 +23,7 @@ class BaseReadWrite(viewsets.ModelViewSet):
     search_fields = ["^id"]  # 각 ViewSet에서 확장
 
 class BrandViewSet(BaseReadWrite):
-    queryset = Brand.objects.all().order_by("name_en")
+    queryset = Brand.objects.all().order_by("id")
     serializer_class = BrandSerializer
     search_fields = ["name_en", "name_ko"]
 

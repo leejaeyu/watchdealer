@@ -27,6 +27,9 @@ import StepLabel from "@mui/material/StepLabel";
 
 import { api, Brand, WatchModel, WatchVariant, Country } from "@/lib/watches";
 import { useAuth } from "@/auth/AuthContext";
+// 상단 import 추가
+import CarouselShell from "../../components/CarouselShell";
+import Image from "next/image";
 
 /* 이미지 절대경로 보정 */
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE!;
@@ -219,28 +222,72 @@ export default function AddTransactionDialog({
           setBrand(b);
           setStep(1);
         }}
+        aria-pressed={selected ? "true" : "false"}
         sx={{
+          // ✅ 부모(Box)의 width에 맞춰 꽉 채움
+          width: "100%",
+          minWidth: 0, // ✅ flex 수축 허용
+          overflow: "hidden", // ✅ 넘침 차단
+
           border: "1px solid",
           borderColor: selected ? "primary.main" : "divider",
           borderRadius: R,
-          px: 1.5,
+          px: 1.25,
           py: 1,
-          minWidth: 112,
+
+          // ⛔ 기존 minWidth: 112 제거 (캐러셀 아이템보다 커서 침범 원인)
+          // minWidth: 112,
+
           bgcolor: selected ? "primary.main" : "background.paper",
           color: selected ? "primary.contrastText" : "text.primary",
         }}
       >
-        <Stack alignItems="center" spacing={0.75} width="100%">
+        <Stack
+          alignItems="center"
+          spacing={0.75}
+          width="100%"
+          sx={{ minWidth: 0 }}
+        >
           <Avatar
             src={imgURL(b.logo)}
             alt={b.name_en}
             sx={{ width: 36, height: 36, bgcolor: "transparent" }}
             variant="rounded"
           />
-          <Typography variant="body2" fontWeight={700} noWrap>
+          <Typography
+            variant="body2"
+            fontWeight={700}
+            noWrap
+            title={b.name_en}
+            sx={{
+              display: "block",
+              width: "100%",
+              maxWidth: "100%",
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              textAlign: "center",
+            }}
+          >
             {b.name_en}
           </Typography>
-          <Typography variant="caption" color="text.secondary" noWrap>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            noWrap
+            title={b.name_ko}
+            sx={{
+              display: "block",
+              width: "100%",
+              maxWidth: "100%",
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              textAlign: "center",
+            }}
+          >
             {b.name_ko}
           </Typography>
         </Stack>
@@ -358,20 +405,22 @@ export default function AddTransactionDialog({
         {/* 0. 브랜드: 가로 스트립 (라운드 최소) */}
         {step === 0 && (
           <Stack spacing={2}>
-            <Box
-              sx={{
-                display: "flex",
-                gap: 1,
-                overflowX: "auto",
-                py: 1,
-                px: 0.5,
-                "&::-webkit-scrollbar": { height: 8 },
-              }}
+            <CarouselShell
+              ariaLabel="브랜드 목록"
+              step="page"
+              snap="proximity"
+              paddingY={8}
             >
               {brands.map((b) => (
-                <BrandPill key={b.id} b={b} />
+                <Box
+                  key={b.id}
+                  role="listitem"
+                  sx={{ flex: "0 0 auto", width: { xs: 128, sm: 144 } }}
+                >
+                  <BrandPill b={b} />
+                </Box>
               ))}
-            </Box>
+            </CarouselShell>
             {brand && HeaderPreview}
           </Stack>
         )}
@@ -380,27 +429,60 @@ export default function AddTransactionDialog({
         {step === 1 && (
           <Stack spacing={2}>
             {brand && HeaderPreview}
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
-                gap: 12 / 8, // 1.5
-              }}
+            <CarouselShell
+              ariaLabel="모델 목록"
+              step="page"
+              snap="proximity"
+              paddingY={8}
             >
-              {models.map((m) => (
-                <GridTile
-                  key={m.id}
-                  img={imgURL(m.image)}
-                  title={m.nickname || "(닉네임 없음)"}
-                  subtitle={brand?.name_en || ""}
-                  selected={model?.id === m.id}
-                  onClick={() => {
-                    setModel(m);
-                    setStep(2);
-                  }}
-                />
-              ))}
-            </Box>
+              {models.map((m) => {
+                const selected = model?.id === m.id;
+                return (
+                  <Box
+                    key={m.id}
+                    role="listitem"
+                    sx={{ flex: "0 0 auto", width: { xs: 140, sm: 160 } }}
+                  >
+                    <Paper
+                      variant="outlined"
+                      sx={{
+                        borderRadius: R,
+                        borderColor: selected ? "primary.main" : "divider",
+                      }}
+                    >
+                      <ButtonBase
+                        onClick={() => {
+                          setModel(m);
+                          setStep(2);
+                        }}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "100%",
+                          height: 50,
+                          borderRadius: R,
+                          px: 1.25,
+                          ...(selected && {
+                            bgcolor: "primary.main",
+                            color: "primary.contrastText",
+                          }),
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          fontWeight={700}
+                          noWrap
+                          sx={{ width: "100%", textAlign: "center" }}
+                        >
+                          {m.nickname || "(닉네임 없음)"}
+                        </Typography>
+                      </ButtonBase>
+                    </Paper>
+                  </Box>
+                );
+              })}
+            </CarouselShell>
           </Stack>
         )}
 
@@ -408,27 +490,31 @@ export default function AddTransactionDialog({
         {step === 2 && (
           <Stack spacing={2}>
             {brand && HeaderPreview}
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
-                gap: 12 / 8,
-              }}
+            <CarouselShell
+              ariaLabel="버전트 목록"
+              step="page"
+              snap="proximity"
+              paddingY={8}
             >
               {variants.map((v) => (
-                <GridTile
+                <Box
                   key={v.id}
-                  img={imgURL(v.image) || imgURL(model?.image)}
-                  title={v.model_number}
-                  subtitle={v.color || undefined}
-                  selected={variant?.id === v.id}
-                  onClick={() => {
-                    setVariant(v);
-                    setStep(3);
-                  }}
-                />
+                  role="listitem"
+                  sx={{ flex: "0 0 auto", width: { xs: 170, sm: 190 } }}
+                >
+                  <GridTile
+                    img={imgURL(v.image) || imgURL(model?.image)}
+                    title={v.model_number}
+                    subtitle={v.color || undefined}
+                    selected={variant?.id === v.id}
+                    onClick={() => {
+                      setVariant(v);
+                      setStep(3);
+                    }}
+                  />
+                </Box>
               ))}
-            </Box>
+            </CarouselShell>
           </Stack>
         )}
 

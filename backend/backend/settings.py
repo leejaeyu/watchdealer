@@ -46,8 +46,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",      # 정적
-    "corsheaders.middleware.CorsMiddleware",           # CORS (CommonMiddleware보다 위)
+    "corsheaders.middleware.CorsMiddleware",
+    # "whitenoise.middleware.WhiteNoiseMiddleware",  # 기본은 주석
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -55,6 +55,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+if not DEBUG:
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 ROOT_URLCONF = "backend.urls"
 if not DEBUG:
