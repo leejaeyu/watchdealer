@@ -1,9 +1,3 @@
-const config = {
-  plugins: ["@tailwindcss/postcss"],
-};
-
-export default config;
-
 // next.config.js (CJS)
 module.exports = {
   images: {
