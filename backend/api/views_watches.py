@@ -28,7 +28,7 @@ class BrandViewSet(BaseReadWrite):
     search_fields = ["name_en", "name_ko"]
 
 class WatchModelViewSet(BaseReadWrite):
-    queryset = WatchModel.objects.select_related("brand").all().order_by("brand__name_en","nickname")
+    queryset = WatchModel.objects.all().order_by("id")
     serializer_class = WatchModelSerializer
     search_fields = ["brand__name_en","nickname"]
 
